@@ -6,31 +6,35 @@ import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
-  React.useEffect(() => setMounted(true), []);
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (!mounted) {
-    return (
-      <Button variant="ghost" size="icon" className="h-9 w-9" disabled>
-        <Sun className="h-4 w-4" />
-      </Button>
-    );
-  }
+  const toggleTheme = React.useCallback(() => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  }, [resolvedTheme, setTheme]);
 
+  // Always render the same structure to avoid hydration mismatches
   return (
     <Button
       variant="ghost"
       size="icon"
       className="h-9 w-9"
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      onClick={toggleTheme}
       aria-label="Toggle theme"
+      suppressHydrationWarning
     >
-      {resolvedTheme === "dark" ? (
-        <Sun className="h-4 w-4" />
+      {mounted ? (
+        resolvedTheme === "dark" ? (
+          <Sun className="h-4 w-4 transition-transform" />
+        ) : (
+          <Moon className="h-4 w-4 transition-transform" />
+        )
       ) : (
-        <Moon className="h-4 w-4" />
+        <Sun className="h-4 w-4" />
       )}
     </Button>
   );
